@@ -1,17 +1,13 @@
--- XzAimGui - Dead Rail by ChatGPT
-
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
 local uis = game:GetService("UserInputService")
 local cam = workspace.CurrentCamera
 local rs = game:GetService("RunService")
 
--- Rainbow function
 local function getRainbowColor(hueOffset)
 	return Color3.fromHSV((tick() / 5 + hueOffset) % 1, 1, 1)
 end
 
--- Find nearest NPC (not players)
 local function getClosestNPC()
 	local shortest = math.huge
 	local closest = nil
@@ -30,7 +26,6 @@ local function getClosestNPC()
 	return closest
 end
 
--- Main GUI
 local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 gui.Name = "XzAimGui"
 gui.ResetOnSpawn = false
@@ -45,7 +40,6 @@ main.Active = true
 main.Draggable = true
 Instance.new("UICorner", main).CornerRadius = UDim.new(0, 12)
 
--- Rainbow border
 local rainbow = Instance.new("UIStroke", main)
 rainbow.Thickness = 3
 rainbow.LineJoinMode = Enum.LineJoinMode.Round
@@ -53,7 +47,6 @@ rs.RenderStepped:Connect(function()
 	rainbow.Color = getRainbowColor(0)
 end)
 
--- Title
 local title = Instance.new("TextLabel", main)
 title.Size = UDim2.new(1, -10, 0, 30)
 title.Position = UDim2.new(0, 5, 0, 5)
@@ -63,7 +56,6 @@ title.TextColor3 = Color3.new(1, 1, 1)
 title.Font = Enum.Font.GothamBold
 title.TextScaled = true
 
--- Full Bright toggle button
 local fullBrightBtn = Instance.new("TextButton", main)
 fullBrightBtn.Size = UDim2.new(0, 120, 0, 25)
 fullBrightBtn.Position = UDim2.new(0.5, -60, 1, -60)
@@ -80,7 +72,6 @@ fullBrightBtn.MouseButton1Click:Connect(function()
 	fullBrightEnabled = not fullBrightEnabled
 	fullBrightBtn.Text = "Full Bright [" .. (fullBrightEnabled and "ON" or "OFF") .. "]"
 	if fullBrightEnabled then
-		-- Set all parts to full bright
 		for _, part in pairs(workspace:GetDescendants()) do
 			if part:IsA("BasePart") then
 				part.Material = Enum.Material.SmoothPlastic
@@ -88,7 +79,6 @@ fullBrightBtn.MouseButton1Click:Connect(function()
 			end
 		end
 	else
-		-- Revert to normal materials
 		for _, part in pairs(workspace:GetDescendants()) do
 			if part:IsA("BasePart") then
 				part.Material = Enum.Material.Plastic
@@ -97,7 +87,6 @@ fullBrightBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- Lock button
 local lockBtn = Instance.new("TextButton", main)
 lockBtn.Size = UDim2.new(0, 120, 0, 35)
 lockBtn.Position = UDim2.new(0.5, -60, 0.5, -20)
@@ -108,7 +97,6 @@ lockBtn.Font = Enum.Font.GothamBold
 lockBtn.TextScaled = true
 Instance.new("UICorner", lockBtn).CornerRadius = UDim.new(0, 10)
 
--- Lock logic
 local locked = false
 local currentTarget = nil
 local camLoop = nil
@@ -125,7 +113,7 @@ local function startLock()
 
 	if deathConn then deathConn:Disconnect() end
 	deathConn = humanoid.Died:Connect(function()
-		startLock() -- Lock NPC mới
+		startLock()
 	end)
 
 	if camLoop then camLoop:Disconnect() end
@@ -153,7 +141,6 @@ lockBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- Noclip toggle button
 local noclipBtn = Instance.new("TextButton", main)
 noclipBtn.Size = UDim2.new(0, 120, 0, 25)
 noclipBtn.Position = UDim2.new(0.5, -60, 1, -90)
@@ -169,22 +156,17 @@ local noclip = false
 local noclipConn
 noclipBtn.MouseButton1Click:Connect(function()
 	noclip = not noclip
-	noclipBtn.Text = "Noclip ["..(noclip and "ON" or "OFF").."]"
+	noclipBtn.Text = "Noclip [" .. (noclip and "ON" or "OFF") .. "]"
 	if noclip then
-		-- Kết nối để thay đổi các phần can collide thành false
 		noclipConn = rs.Stepped:Connect(function()
-			-- Lặp qua các phần của nhân vật, bao gồm R6 và R15
 			for _, part in pairs(player.Character:GetDescendants()) do
-				-- Nếu phần đó là BasePart, tắt CanCollide
 				if part:IsA("BasePart") then
 					part.CanCollide = false
 				end
 			end
 		end)
 	else
-		-- Ngắt kết nối khi tắt noclip
 		if noclipConn then noclipConn:Disconnect() end
-		-- Kích hoạt lại CanCollide cho tất cả các phần của nhân vật
 		for _, part in pairs(player.Character:GetDescendants()) do
 			if part:IsA("BasePart") then
 				part.CanCollide = true
